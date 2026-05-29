@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Broker MQTT (EMQX) - Suporta milhares/milhões de dispositivos e WebSockets
+  emqx:
+    image: emqx:5.3
+    container_name: smartcity_emqx
+    ports:
+      - "1883:1883"     # Porta MQTT nativa (Usada pelo ns-3 / Paho C++)
+      - "8085:8083"     # Porta MQTT sobre WebSockets (Usada pelo Frontend)
+      - "18083:18083"   # Painel de Administração Web do EMQX
+    environment:
+      - EMQX_NODE__NAME=emqx@127.0.0.1
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=admin
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    restart: unless-stopped
+    networks:
+      - smartcity_net
+
+  # Banco de Dados (TimescaleDB / PostgreSQL) - Para hierarquia e telemetria
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: smartcity_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=smartcity
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - smartcity_net
+
+  # Cache e Filas de Mensagem (Redis) - Para estado em tempo real
+  redis:
+    image: redis:7-alpine
+    container_name: smartcity_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - smartcity_net
+
+volumes:
+  emqx_data:
+  emqx_log:
+  pg_data:
+  redis_data:
+
+networks:
+  smartcity_net:
+    driver: bridge

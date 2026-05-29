@@ -68,31 +68,25 @@ Vamos bloquear o tráfego do grupo de sensores de Qualidade do Ar (`192.168.2.0/
 
 ## Parte 2: Simulação no NS-3
 
-Foi criado um script NS-3 (`smart_city_ns3.cc`) que reflete a mesma topologia lógica do Mininet (3 grupos -> 3 gateways -> 1 servidor). Ele utiliza aplicações UDP Echo para gerar tráfego e o FlowMonitor para coletar as métricas exigidas.
+Foi criado um script NS-3 (`scratch/smart_city_final.cc`) que reflete a mesma topologia lógica do Mininet. Ele utiliza o FlowMonitor para coletar as métricas exigidas e exporta os dados em formato JSON para facilitar a análise.
 
 ### Como Executar a Simulação
 
-O script permite executar um cenário normal e um cenário com limitação de tráfego, controlado via parâmetro de linha de comando.
-
-1.  **Copie o script para o diretório `scratch` do NS-3:**
-    *(Assumindo que você tem o NS-3 instalado em algum diretório, ex: `~/ns-3-dev`)*
+1.  **Vá para a raiz do projeto NS-3:**
     ```bash
-    cp smart_city_ns3.cc ~/ns-3-dev/scratch/
-    cd ~/ns-3-dev
+    cd ..
     ```
 
 2.  **Cenário Normal:**
-    Execute a simulação sem limitações:
     ```bash
-    ./ns3 run "scratch/smart_city_ns3"
+    ./ns3 run "scratch/smart_city_final"
     ```
-    *A simulação imprimirá métricas como Throughput, Delay e Packet Loss para os fluxos.*
 
-3.  **Cenário com Limitação:**
-    Vamos simular um estrangulamento na largura de banda do link entre o Gateway 2 e o Servidor, o que forçará perda de pacotes e aumento de atraso.
+3.  **Cenário com Limitação (Gateway 2):**
     ```bash
-    ./ns3 run "scratch/smart_city_ns3 --limitGateway2=true"
+    ./ns3 run "scratch/smart_city_final --limitGateway2=true"
     ```
+
 
 ### Comparação de Resultados
 Anote os resultados exibidos no terminal (Throughput, Rx Packets, Tx Packets, Delay) nos dois cenários para apresentar a comparação solicitada nos requisitos do projeto. Você verá uma clara degradação no desempenho (queda de throughput e aumento de loss/delay) no cenário limitado.

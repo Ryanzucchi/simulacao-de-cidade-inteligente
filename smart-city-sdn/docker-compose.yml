@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Controlador SDN Ryu
+  ryu-controller:
+    image: osrg/ryu
+    container_name: sdn_controller
+    command: ryu-manager ryu.app.simple_switch_13
+    ports:
+      - "6633:6633"
+      - "6653:6653"
+      - "8080:8080"
+    networks:
+      - sdn_net
+
+  # Mininet (Emulador OVS + VNFs)
+  mininet:
+    image: iwaseyusuke/mininet:latest
+    container_name: mininet_core
+    privileged: true
+    pid: "host"
+    networks:
+      - sdn_net
+    volumes:
+      - /lib/modules:/lib/modules
+      - ./smart_city_mininet.py:/root/smart_city_mininet.py
+    command: bash -c "service openvswitch-switch start && python3 /root/smart_city_mininet.py"
+
+networks:
+  sdn_net:
+    driver: bridge
